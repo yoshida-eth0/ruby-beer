@@ -1,6 +1,3 @@
-# see also:
-#   https://en.wikipedia.org/wiki/Brix
-#   https://en.wikipedia.org/wiki/Relative_density
 module Beer
   class Ingredient
     attr_reader :sg
@@ -10,24 +7,35 @@ module Beer
       @sg = sg
     end
 
+    # Brixに換算する
+    #
+    # https://en.wikipedia.org/wiki/Brix#Specific_gravity_2
     def brix
       182.4601 * sg**3 - 775.6821 * sg**2 + 1262.7794 * sg - 669.5622
     end
 
+    # Platoに換算する
+    #
+    # https://en.wikipedia.org/wiki/Brix#Specific_gravity_2
     def plato
       135.997 * sg**3 - 630.272 * sg**2 + 1111.14 * sg - 616.868
     end
 
-    def ppg(mash_effiency=1.0, gallon: GALLON)
-      #1000.0 * POUND * (sg - 1.0) / (mash_effiency * (gallon + POUND))
+    # PPGに換算する
+    def ppg
       (sg - 1.0) * 1000
     end
 
+    # self 1ポンドあたり水1ガロンを合わせたIngredientを返す
+    #
+    # @param gallon [Float] ガロンからリットルへの変換係数
     def to_ppg(gallon: GALLON)
       self.class.sg(POUND * (sg - 1.0) / (gallon + POUND) + 1.0)
     end
 
-    # 予想アルコール度数
+    # 予想アルコール度数に換算する
+    #
+    # https://en.wikipedia.org/wiki/Gravity_(alcoholic_beverage)
     def abv(attenuation=0.75)
       og = sg
       fg = og - (og - 1) * attenuation
@@ -70,6 +78,7 @@ module Beer
       end
 
       # 目標アルコール度数からオブジェクト生成
+      #
       # @param abv [Float] 目標アルコール度数 (ex: 0.057)
       # @param attenuation [Float] 発酵率 (ex: 0.75)
       def abv(abv, attenuation=0.75)
@@ -78,6 +87,7 @@ module Beer
       end
       alias_method :alcohol_by_volume, :abv
     end
+
 
     WATER = sg(1.0)
     MALT_EXTRACT = sg(1.30800000459)

@@ -6,26 +6,38 @@ module Beer
       @malts = []
     end
 
+    # モルト追加
+    #
+    # @param weight [Float] 重量
+    # @param malt [Beer::Malt::Base] モルト
     def add(weight, malt)
       @malts << [weight, malt]
       self
     end
 
+    # モルト総重量
     def weight
       malts.map(&:first).sum || 0.0
     end
 
+    # 比重
+    #
+    # @param brewhouse_efficiency [Float] 醸造効率 (ex: 0.80)
     def gravity(brewhouse_efficiency=1.0)
       malts.map {|weight, malt|
         (malt.sg(brewhouse_efficiency) - 1) * weight
       }.sum || 0.0
     end
 
+    # 複数のモルトを混ぜ合わせる
     def to_malt
       ppg = gravity(1.0) / weight * 1000
       Malt::PPG.new(ppg)
     end
 
+    # 原料に変換
+    #
+    # @param brewhouse_efficiency [Float] 醸造効率 (ex: 0.80)
     def to_ingredient(brewhouse_efficiency=1.0)
       to_malt.to_ingredient(brewhouse_efficiency)
     end
